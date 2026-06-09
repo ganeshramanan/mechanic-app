@@ -102,20 +102,6 @@ app.get("/vehicle/:number", (req, res) => {
     res.status(500).json({ error: "Query failed" });
   }
 });
-app.get("/debug-db", (req, res) => {
-  try {
-    const rows = db.prepare(`
-      SELECT vehicle_number, service_date, next_service_date
-      FROM Service
-    `).all();
-
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
 
 /* ---------------- DUE SERVICES API ---------------- */
 app.get("/due-services", (req, res) => {
@@ -136,6 +122,7 @@ app.get("/due-services", (req, res) => {
     res.status(500).json({ error: "Failed to fetch due services" });
   }
 });
+
 /* ---------------- DEBUG DB API ---------------- */
 app.get("/debug-db", (req, res) => {
   try {
@@ -149,9 +136,6 @@ app.get("/debug-db", (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
-
 
 /* ---------------- RESET DB API ---------------- */
 app.get("/reset-db", (req, res) => {
