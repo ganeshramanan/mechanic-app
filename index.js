@@ -105,20 +105,31 @@ app.get("/vehicle/:number", (req, res) => {
 
 /* ---------------- DUE SERVICES API ---------------- */
 app.get("/due-services", (req, res) => {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+
+  const in7Days = new Date();
+  in7Days.setDate(today.getDate() + 7);
+  const next7Str = in7Days.toISOString().split("T")[0];
 
   const stmt = db.prepare(`
     SELECT *,
     CASE
       WHEN date(next_service_date) < date(?) THEN 'OVERDUE'
-      ELSE 'UPCOMING'
+      WHEN date(next_service_date) <= date(?) THEN 'DUE_SOON'
+      ELSE 'OK'
     END as status
     FROM Service
     ORDER BY next_service_date ASC
   `);
 
-  res.json(stmt.all(today));
+  const rows = stmt.all(todayStr, next7Str);
+
+  res.json(rows);
 });
+
+
+
 
 
 
