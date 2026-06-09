@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Mechanic App</title>
+  </head>
+  <body>
+    <h2>Search Vehicle</h2>
+
+    <input id="v" placeholder="Vehicle Number" />
+    <button onclick="search()">Search</button>
+
+    <div id="output"></div>
+
+    <script>
+      function search() {
+        const v = document.getElementById("v").value;
+
+        fetch("http://localhost:3000/vehicle/" + v)
+          .then((res) => res.json())
+          .then((data) => {
+            let html = "";
+
+            if (data.length === 0) {
+              html = "No records found";
+            } else {
+              data.forEach((item) => {
+                html += `
+            <div style="border:1px solid black; margin:10px; padding:10px;">
+              <b>Vehicle:</b> ${item.vehicle_number} <br>
+              <b>Service:</b> ${item.description} <br>
+              <b>Cost:</b> ₹${item.cost} <br>
+              <b>Date:</b> ${item.service_date}
+            </div>
+          `;
+              });
+            }
+
+            document.getElementById("output").innerHTML = html;
+          });
+      }
+    </script>
+  </body>
+</html>
