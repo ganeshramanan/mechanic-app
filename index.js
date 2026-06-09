@@ -105,23 +105,23 @@ app.get("/vehicle/:number", (req, res) => {
 
 /* ---------------- DUE SERVICES API ---------------- */
 app.get("/due-services", (req, res) => {
-  try {
-    const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
 
-    const stmt = db.prepare(`
-      SELECT * FROM Service
-      WHERE next_service_date <= ?
-      ORDER BY next_service_date ASC
-    `);
+  const stmt = db.prepare(`
+    SELECT *,
+    CASE
+      WHEN date(next_service_date) < date(?) THEN 'OVERDUE'
+      ELSE 'UPCOMING'
+    END as status
+    FROM Service
+    ORDER BY next_service_date ASC
+  `);
 
-    const rows = stmt.all(today);
-
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch due services" });
-  }
+  res.json(stmt.all(today));
 });
+
+
+
 
 /* ---------------- DEBUG DB API ---------------- */
 app.get("/debug-db", (req, res) => {
